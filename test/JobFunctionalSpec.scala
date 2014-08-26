@@ -29,7 +29,6 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
       status(jobCreate) must equalTo(SEE_OTHER)
 
       redirectLocation(jobCreate) must beSome[String].which(_.matches("/job/[a-z0-9]{24}$"))
-
     }
 
     "show a creating form on GET /job/" in new WithApplication(fakeApp) {
