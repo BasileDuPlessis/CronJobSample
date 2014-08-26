@@ -1,13 +1,16 @@
 package models
 
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.data.format.Formats._
 import reactivemongo.api._
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson._
 import reactivemongo.core.commands.LastError
 
-
-
 import scala.concurrent.Future
+
+import _root_.utils.CustomMappings._
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
@@ -35,6 +38,7 @@ object Job {
   }
 
   implicit object RecipeBSONWriter extends BSONDocumentWriter[Job] {
+
     def write(job: Job): BSONDocument =
       BSONDocument(
         "_id" -> job.id.getOrElse(BSONObjectID.generate),
@@ -45,5 +49,12 @@ object Job {
   def insert(job: Job): DefaultDB => Future[LastError] = {
     db:DefaultDB =>  db[BSONCollection](collectionName).insert[Job](job)
   }
+
+  val jobForm = Form(
+    mapping(
+      "id" -> optional(of[BSONObjectID]),
+      "url" -> text
+    )(Job.apply)(Job.unapply)
+  )
 
 }
