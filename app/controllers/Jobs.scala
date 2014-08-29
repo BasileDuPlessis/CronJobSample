@@ -4,6 +4,7 @@ import models.Job
 import play.api._
 import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
+import services.JobService
 
 import scala.concurrent.Future
 
@@ -22,8 +23,15 @@ object Jobs extends Controller {
     Ok(views.html.jobs.create(Job.jobForm))
   }
 
-  def view(id: String) = Action {
-    Ok(id)
+  def view(id: String) = Action.async {
+    withMongoConnection {
+      JobService.readFromId(id)
+    } map {
+      case Some(job: Job) => Ok(views.html.jobs.view(job))
+      case _ => NotFound(s"Job $id not found")
+    } recover {
+      case e => BadRequest(e.getMessage)
+    }
   }
 
   def create = Action.async { implicit request =>

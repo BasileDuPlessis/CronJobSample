@@ -7,6 +7,9 @@ import play.api.test.Helpers._
 
 import com.github.athieriot._
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 /**
  * Functional spec for Job controller
  */
@@ -19,9 +22,11 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
   val fakeApp = FakeApplication(additionalConfiguration = conf)
 
+  step(play.api.Play.start(fakeApp))
+
   "Job controller" should {
 
-    "create a new Job on POST /job/create and redirect to /job/:id" in new WithApplication(fakeApp) {
+    "create a new Job on POST /job/create and redirect to /job/:id" in {
       val jobCreate = route(FakeRequest(POST, "/job/create").withFormUrlEncodedBody(
         ("url", "http://www.leboncoin.fr")
       )).get
@@ -29,14 +34,31 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
       status(jobCreate) must equalTo(SEE_OTHER)
 
       redirectLocation(jobCreate) must beSome[String].which(_.matches("/job/[a-z0-9]{24}$"))
+
     }
 
-    "show a creating form on GET /job/" in new WithApplication(fakeApp) {
-      val jobCreate = route(FakeRequest(GET, "/job/")).get
+    "show a creating form on GET /job/" in {
+      val jobGetCreate = route(FakeRequest(GET, "/job/")).get
 
-      status(jobCreate) must equalTo(OK)
+      status(jobGetCreate) must equalTo(OK)
 
-      contentAsString(jobCreate) must contain("Create job")
+      contentAsString(jobGetCreate) must contain("Create job")
+
+    }
+
+    "show job details on GET /job/:id" in {
+      val jobCreate = route(FakeRequest(POST, "/job/create").withFormUrlEncodedBody(
+        ("url", "http://www.leboncoin.fr")
+      )).get
+
+      val id = "/job/(.+)$".r.findFirstMatchIn(redirectLocation(jobCreate).get).get.group(1)
+
+      val jobDetails = route(FakeRequest(GET, s"/job/$id")).get
+
+      status(jobDetails) must equalTo(OK)
+
+      contentAsString(jobDetails) must contain("http://www.leboncoin.fr")
+
     }
 
   }
