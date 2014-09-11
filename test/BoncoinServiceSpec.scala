@@ -6,8 +6,8 @@ import services.BoncoinService
  */
 class BoncoinServiceSpec extends Specification {
 
-  "BoncoinService#parse string" should {
-    "get all ads urls" in {
+  "BoncoinService#parseAds" should {
+    "get all unique ads urls" in {
       val s =
         """
           <a href="http://www.leboncoin.fr/ventes_immobilieres/698697514.htm?ca=12_s" title="Tr&egrave;s Rare, Maison neuve F3 en beton cellulaire">

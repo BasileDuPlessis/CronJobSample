@@ -27,9 +27,6 @@ object BoncoinService {
   //Get Ads from an url
   def parseAds(s: String): Set[String] = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
 
-  //Return new Ads from a Job
-  def getNewAds(job: Job): List[String] = List()
-
 
   //Send mail
   def sendMail(l: List[String]): Unit = {
@@ -58,9 +55,11 @@ object BoncoinService {
 
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
-      adList <- pure(getNewAds(job))
-      sent <- pure(sendMail(adList))
-      saved <- Job.updateAds(adList)
+      html <- pure(Source.fromURL(job.url).getLines().mkString)
+      adsList <- pure(parseAds(html).toList)
+      //newAdsList <- adsList.filterNot(Set[String]())
+      sent <- pure(sendMail(adsList))
+      saved <- Job.updateAds(adsList)
     } yield saved
   }
 
