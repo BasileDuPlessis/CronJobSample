@@ -22,7 +22,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 case class Job(
   id: Option[BSONObjectID],
-  url: String
+  url: String,
+  ads: Option[List[String]]
 )
 
 
@@ -34,7 +35,8 @@ object Job {
     def read(doc: BSONDocument): Job =
       Job(
         doc.getAs[BSONObjectID]("_id"),
-        doc.getAs[String]("url").get
+        doc.getAs[String]("url").get,
+        doc.getAs[List[String]]("ads")
       )
   }
 
@@ -43,7 +45,8 @@ object Job {
     def write(job: Job): BSONDocument =
       BSONDocument(
         "_id" -> job.id.getOrElse(BSONObjectID.generate),
-        "url" -> job.url
+        "url" -> job.url,
+        "ads" -> job.ads.getOrElse(List[String]())
       )
   }
 
@@ -51,8 +54,10 @@ object Job {
     db:DefaultDB =>  db[BSONCollection](collectionName).insert[Job](job)
   }
 
-  def updateAds(adList: List[String]): DefaultDB => Future[LastError] = {
-    db:DefaultDB =>  Future(LastError(false, None, None, None, None, 0, false))
+  def updateAds(job: Job, ads: List[String]): DefaultDB => Future[LastError] = {
+    db:DefaultDB =>  db[BSONCollection](collectionName).update(
+      BSONDocument("_id" -> id)
+    )
   }
 
   /**
@@ -72,7 +77,8 @@ object Job {
   val jobForm = Form(
     mapping(
       "id" -> optional(of[BSONObjectID]),
-      "url" -> text
+      "url" -> text,
+      "results" -> optional(list(text))
     )(Job.apply)(Job.unapply)
   )
 

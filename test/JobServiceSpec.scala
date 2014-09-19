@@ -14,6 +14,7 @@ import utils.MongoConnection._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+@RunWith(classOf[JUnitRunner])
 /**
  * Functional spec for Job controller
  */
@@ -22,7 +23,7 @@ class JobServiceSpec extends Specification with EmbedConnection {
 
   val connection = testConnection
 
-  val job = Job(Some(BSONObjectID.generate), "http://www.leboncoin.fr")
+  val job = Job(Some(BSONObjectID.generate), "http://www.leboncoin.fr", None)
 
   "JobService.readFromId" should {
     "read a job from a string ID" in {

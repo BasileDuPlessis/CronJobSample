@@ -13,7 +13,7 @@ import org.mockito.Matchers
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.api.collections.GenericQueryBuilder
 import reactivemongo.api.collections.default.BSONCollection
-import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONObjectID}
+import reactivemongo.bson._
 import reactivemongo.core.commands.LastError
 
 import scala.concurrent.{Await, Future}
@@ -30,7 +30,7 @@ class JobModelSpec extends Specification with Mockito {
 
       val mockDefaultDB = mock[DefaultDB]
       val mockCollection = mock[BSONCollection]
-      val job = Job(None, "http://www.leboncoin.fr")
+      val job = Job(None, "http://www.leboncoin.fr", None)
 
       when(
         mockDefaultDB[BSONCollection](anyString, any)(any)
@@ -48,12 +48,12 @@ class JobModelSpec extends Specification with Mockito {
     }
   }
 
-  "Recipe#readOne(BSONObjectID)" should {
+  "Job#read(BSONObjectID)" should {
     "call find with id parameter on collection" in {
       val mockDefaultDB = mock[DefaultDB]
       val mockCollection = mock[BSONCollection]
       val id = BSONObjectID.generate
-      val job = Job(Some(id), "http://www.leboncoin.fr")
+      val job = Job(Some(id), "http://www.leboncoin.fr", None)
 
       when(
         mockDefaultDB[BSONCollection](anyString, any)(any)
@@ -77,7 +77,7 @@ class JobModelSpec extends Specification with Mockito {
     }
   }
 
-  "Recipe#readAll" should {
+  "Job#readAll" should {
     "return all jobs in a list" in {
       val mockDefaultDB = mock[DefaultDB]
       val mockCollection = mock[BSONCollection]
@@ -105,6 +105,36 @@ class JobModelSpec extends Specification with Mockito {
       )
 
       there was one(mockCollection).find(BSONDocument())
+
+    }
+  }
+
+  "Job#updateAds" should {
+    "update ads field in a job" in {
+      val mockDefaultDB = mock[DefaultDB]
+      val mockCollection = mock[BSONCollection]
+      val mockFuture = mock[Future[LastError]]
+
+      val job = Job(Some(BSONObjectID.generate), "http://www.leboncoin.fr", None)
+      val ads = List("A", "B")
+
+      val selector = BSONDocument("_id" -> job.id)
+      val modifier =  BSONDocument("$addToSet" -> ads)
+
+      when(
+        mockDefaultDB[BSONCollection](anyString, any)(any)
+      ) thenReturn mockCollection
+
+      when(
+        mockCollection.update(Matchers.eq(selector), Matchers.eq(modifier), any, any, any)(any, any, any)
+      ) thenReturn mockFuture
+
+
+      Await.result(
+        Job.updateAds(job, ads)(mockDefaultDB), Duration.Inf
+      )
+
+      there was one(mockCollection).update(selector, modifier)
 
     }
   }

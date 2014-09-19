@@ -59,7 +59,7 @@ object BoncoinService {
       adsList <- pure(parseAds(html).toList)
       //newAdsList <- adsList.filterNot(Set[String]())
       sent <- pure(sendMail(adsList))
-      saved <- Job.updateAds(adsList)
+      saved <- Job.updateAds(job, adsList)
     } yield saved
   }
 
