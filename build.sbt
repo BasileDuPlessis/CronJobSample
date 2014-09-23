@@ -1,4 +1,4 @@
-name := """BoncoinWatcher"""
+name := """CronJobSample"""
 
 version := "1.0-SNAPSHOT"
 

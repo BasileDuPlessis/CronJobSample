@@ -10,10 +10,11 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.mockito.Mockito._
 import org.mockito.Matchers
-import reactivemongo.api.{Cursor, DefaultDB}
+import reactivemongo.api._
 import reactivemongo.api.collections.GenericQueryBuilder
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson._
+import reactivemongo.bson.Producer._
 import reactivemongo.core.commands.LastError
 
 import scala.concurrent.{Await, Future}
@@ -115,11 +116,14 @@ class JobModelSpec extends Specification with Mockito {
       val mockCollection = mock[BSONCollection]
       val mockFuture = mock[Future[LastError]]
 
-      val job = Job(Some(BSONObjectID.generate), "http://www.leboncoin.fr", None)
+      val id = BSONObjectID.generate
+      val job = Job(Some(id), "http://www.leboncoin.fr", None)
       val ads = List("A", "B")
 
       val selector = BSONDocument("_id" -> job.id)
-      val modifier =  BSONDocument("$addToSet" -> ads)
+
+      //force implicit conversion for intellij
+      val modifier =  BSONDocument(nameValue2Producer("$addToSet" -> ads))
 
       when(
         mockDefaultDB[BSONCollection](anyString, any)(any)
@@ -131,7 +135,7 @@ class JobModelSpec extends Specification with Mockito {
 
 
       Await.result(
-        Job.updateAds(job, ads)(mockDefaultDB), Duration.Inf
+        Job.updateAds(id, ads)(mockDefaultDB), Duration.Inf
       )
 
       there was one(mockCollection).update(selector, modifier)

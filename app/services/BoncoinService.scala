@@ -31,7 +31,7 @@ object BoncoinService {
   //Send mail
   def sendMail(l: List[String]): Unit = {
     val mail = use[MailerPlugin].email
-    mail.setSubject("Alerte Boncoin")
+    mail.setSubject("Alerte Job")
     mail.setRecipient("Basile du Plessis <basile.duplessis@gmail.com>")
     mail.setFrom("Basile du Plessis <basile.duplessis@gmail.com>")
 
@@ -53,13 +53,19 @@ object BoncoinService {
     }
   }
 
+  /**
+   * Execute job, send email with new ads
+   * @param job
+   * @return
+   */
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
+      id <- pure(job.id.get)
       html <- pure(Source.fromURL(job.url).getLines().mkString)
-      adsList <- pure(parseAds(html).toList)
-      //newAdsList <- adsList.filterNot(Set[String]())
-      sent <- pure(sendMail(adsList))
-      saved <- Job.updateAds(job, adsList)
+      ads <- pure(parseAds(html).toList)
+      newAds <- pure(ads.filterNot(job.ads.get.toSet))
+      sent <- pure(sendMail(newAds))
+      saved <- Job.updateAds(id, newAds)
     } yield saved
   }
 

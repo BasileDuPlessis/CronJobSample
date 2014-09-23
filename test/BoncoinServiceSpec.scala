@@ -22,8 +22,9 @@ class BoncoinServiceSpec extends Specification {
         )
       )
 
-
     }
   }
+
+
 
 }
