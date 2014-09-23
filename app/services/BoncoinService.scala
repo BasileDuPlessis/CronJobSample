@@ -38,6 +38,7 @@ object BoncoinService {
     val text = l.mkString(", ")
 
     mail.send( text, s"<html>$text</html>")
+    Logger.info("Mail sent")
 
   }
 

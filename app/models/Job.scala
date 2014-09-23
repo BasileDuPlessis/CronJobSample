@@ -55,6 +55,7 @@ object Job {
   }
 
   def updateAds(id: BSONObjectID, ads: List[String]): DefaultDB => Future[LastError] = {
+    Logger.info("News ads found : " + ads.mkString(", "))
     db:DefaultDB =>  db[BSONCollection](collectionName).update(
       BSONDocument("_id" -> id),
       BSONDocument("$addToSet" -> ads)
