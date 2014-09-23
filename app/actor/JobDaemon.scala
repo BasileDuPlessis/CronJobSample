@@ -3,6 +3,7 @@ package actor
 
 import akka.actor.Actor
 import play.api.Logger
+import services.BoncoinService
 
 
 /**
@@ -13,6 +14,7 @@ class JobDaemon extends Actor {
   def receive = {
     case _ => {
       Logger.info("Looking for jobs to execute")
+      BoncoinService.doJobs
     }
   }
 
