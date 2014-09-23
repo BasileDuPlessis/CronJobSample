@@ -47,7 +47,11 @@ object BoncoinService {
       Job.readAll
     } map {
       jobList => jobList foreach {
-        job => withMongoConnection {doJob(job)}
+        job => withMongoConnection {doJob(job)} map {
+          lastError => {
+            Logger.debug("New ads saved")
+          }
+        }
       }
     } recover {
       case e => Logger.error("Error occurs while reading all jobs", e)
