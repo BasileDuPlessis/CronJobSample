@@ -61,7 +61,7 @@ object BoncoinService {
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
       id <- pure(job.id.get)
-      html <- pure(Source.fromURL(job.url).getLines().mkString)
+      html <- pure(Source.fromURL(job.url)("iso-8859-15").getLines().mkString)
       ads <- pure(parseAds(html).toList)
       newAds <- pure(ads.filterNot(job.ads.get.toSet))
       sent <- pure(sendMail(newAds))
