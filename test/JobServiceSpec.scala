@@ -14,6 +14,8 @@ import utils.MongoConnection._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+import play.api.Logger
+
 @RunWith(classOf[JUnitRunner])
 /**
  * Functional spec for Job controller
@@ -23,16 +25,34 @@ class JobServiceSpec extends Specification with EmbedConnection {
 
   val connection = testConnection
 
-  val job = Job(Some(BSONObjectID.generate), "http://www.leboncoin.fr", None)
-
-  "JobService.readFromId" should {
+  "JobService#readFromId" should {
     "read a job from a string ID" in {
+
+      val job = Job(Some(BSONObjectID.generate), "url", None)
 
       Await.result(Job.insert(job)(connection), Duration.Inf)
 
       Await.result(
         JobService.readFromId(job.id.get.stringify)(connection), Duration.Inf
       ).get.id must beEqualTo(job.id)
+
+    }
+  }
+
+  "JobService#upddateAds" should {
+    "Add non existant ads in ads field" in {
+
+      val job = Job(Some(BSONObjectID.generate), "url", None)
+
+      Await.result(Job.insert(job)(connection), Duration.Inf)
+
+      Await.result(
+        JobService.updateAds(job.id.get.stringify, List("A", "B", "A"))(connection), Duration.Inf
+      )
+
+      Await.result(
+        JobService.readFromId(job.id.get.stringify)(connection), Duration.Inf
+      ).get.ads.get must beEqualTo(List("A", "B"))
 
     }
   }

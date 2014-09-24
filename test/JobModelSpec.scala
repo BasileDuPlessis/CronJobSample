@@ -110,20 +110,15 @@ class JobModelSpec extends Specification with Mockito {
     }
   }
 
-  "Job#updateAds" should {
-    "update ads field in a job" in {
+  "Job#update" should {
+    "update field in a job" in {
       val mockDefaultDB = mock[DefaultDB]
       val mockCollection = mock[BSONCollection]
       val mockFuture = mock[Future[LastError]]
 
       val id = BSONObjectID.generate
-      val job = Job(Some(id), "http://www.leboncoin.fr", None)
-      val ads = List("A", "B")
-
-      val selector = BSONDocument("_id" -> job.id)
-
-      //force implicit conversion for intellij
-      val modifier =  BSONDocument(nameValue2Producer("$addToSet" -> ads))
+      val selector = BSONDocument("_id" -> id)
+      val modifier =  BSONDocument()
 
       when(
         mockDefaultDB[BSONCollection](anyString, any)(any)
@@ -135,7 +130,7 @@ class JobModelSpec extends Specification with Mockito {
 
 
       Await.result(
-        Job.updateAds(id, ads)(mockDefaultDB), Duration.Inf
+        Job.update(id, modifier)(mockDefaultDB), Duration.Inf
       )
 
       there was one(mockCollection).update(selector, modifier)

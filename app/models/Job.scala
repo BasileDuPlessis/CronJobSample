@@ -54,14 +54,8 @@ object Job {
     db:DefaultDB =>  db[BSONCollection](collectionName).insert[Job](job)
   }
 
-  def updateAds(id: BSONObjectID, ads: List[String]): DefaultDB => Future[LastError] = {
-
-    Logger.info("News ads found and saved: " + ads.mkString(", "))
-
-    db:DefaultDB =>  db[BSONCollection](collectionName).update(
-      BSONDocument("_id" -> id),
-      BSONDocument("$addToSet" -> ads)
-    )
+  def update(id: BSONObjectID, modifier: BSONDocument): DefaultDB => Future[LastError] = {
+    db:DefaultDB =>  db[BSONCollection](collectionName).update(BSONDocument("_id" -> id), modifier)
   }
 
   /**

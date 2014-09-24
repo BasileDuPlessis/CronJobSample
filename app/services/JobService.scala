@@ -28,4 +28,18 @@ object JobService {
     } yield result
 
 
+  def updateAds(id: String, ads: List[String]): Reader[DefaultDB, Future[LastError]] = {
+    for {
+      tryId <- pure(BSONObjectID.parse(id))
+      result <- tryId map {
+        oid => Job.update(
+          oid,
+          BSONDocument("$addToSet" -> BSONDocument("ads" -> BSONDocument("$each" -> ads)))
+        )
+      }
+    } yield result
+
+  }
+
+
 }
