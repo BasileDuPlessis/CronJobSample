@@ -30,7 +30,7 @@ object Di {
   /**
    * Convert a Try[A => Future[B]] to a Reader[A, Future[B]]
    */
-  implicit def TryReaderFutureToReaderFuture[A, B](tryFuture: Try[A => Future[B]]): Reader[A, Future[B]] =
+  implicit def TryFutureToReaderFuture[A, B](tryFuture: Try[A => Future[B]]): Reader[A, Future[B]] =
     Future(tryFuture.get)
 
 

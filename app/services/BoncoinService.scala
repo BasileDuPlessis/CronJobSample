@@ -42,6 +42,16 @@ object BoncoinService {
 
   }
 
+  def tryNewAds(a: List[String], b: List[String]): Try[List[String]] = {
+    val diff = a.filterNot(b.toSet)
+    Try {
+      diff match {
+        case Nil => throw new Exception("No ads found")
+        case _ => diff
+      }
+    }
+  }
+
   def doJobs: Unit = {
     withMongoConnection {
       Job.readAll
@@ -49,8 +59,10 @@ object BoncoinService {
       jobList => jobList foreach {
         job => withMongoConnection {doJob(job)} map {
           lastError => {
-            Logger.debug("New ads saved")
+            Logger.info("New ads saved with lastError: " + lastError)
           }
+        } recover {
+          case e => Logger.info("No ads to save")
         }
       }
     } recover {
@@ -65,13 +77,17 @@ object BoncoinService {
    */
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
-      id <- pure(job.id.get.stringify)
+      id <- pure(job.id.get)
       html <- pure(Source.fromURL(job.url)("iso-8859-15").getLines().mkString)
       ads <- pure(parseAds(html).toList)
-      newAds <- pure(ads.filterNot(job.ads.get.toSet))
-      sent <- pure(sendMail(newAds))
-      saved <- JobService.updateAds(id, newAds)
-    } yield saved
+      newAds <- pure(tryNewAds(ads, job.ads.get))
+      result <- newAds map {
+        l => {
+          sendMail(l)
+          JobService.updateAds(id.stringify, l).g
+        }
+      }
+    } yield result
   }
 
 }
