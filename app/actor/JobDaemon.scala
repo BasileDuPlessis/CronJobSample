@@ -17,10 +17,6 @@ class JobDaemon extends Actor {
       Logger.info("Looking for jobs to execute")
       BoncoinService.doJobs
     }
-    case "cloudBeesActivator" => {
-      Logger.info("Call cloudbees home")
-      Source.fromURL("http://cronjobsample.basileduplessis.eu.cloudbees.net/").getLines().mkString
-    }
   }
 
 }

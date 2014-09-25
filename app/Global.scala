@@ -23,7 +23,6 @@ object Global extends GlobalSettings {
     Logger.info("Scheduling the job daemon")
     val jobActor = Akka.system(app).actorOf(Props(new JobDaemon()))
     Akka.system(app).scheduler.schedule(0 seconds, 5 minutes, jobActor, "jobActor")
-    Akka.system(app).scheduler.schedule(0 seconds, 30 minutes, jobActor, "cloudBeesActivator")
   }
 
 }
