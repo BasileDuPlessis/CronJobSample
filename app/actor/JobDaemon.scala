@@ -19,7 +19,7 @@ class JobDaemon extends Actor {
     }
     case "cloudBeesActivator" => {
       Logger.info("Call cloudbees home")
-      Source.fromURL("http://cronjobsample.basileduplessis.eu.cloudbees.net/")
+      Source.fromURL("http://cronjobsample.basileduplessis.eu.cloudbees.net/").getLines().mkString
     }
   }
 
