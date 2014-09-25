@@ -4,6 +4,7 @@ package actor
 import akka.actor.Actor
 import play.api.Logger
 import services.BoncoinService
+import scala.io.Source
 
 
 /**
@@ -12,9 +13,13 @@ import services.BoncoinService
 class JobDaemon extends Actor {
 
   def receive = {
-    case _ => {
+    case "jobActor" => {
       Logger.info("Looking for jobs to execute")
       BoncoinService.doJobs
+    }
+    case "cloudBeesActivator" => {
+      Logger.info("Call cloudbees home")
+      Source.fromURL("http://cronjobsample.basileduplessis.eu.cloudbees.net/")
     }
   }
 
