@@ -69,22 +69,7 @@ object BoncoinService {
       case e => Logger.error("Error occurs while reading all jobs", e)
     }
   }
-/*
-  import libraries.Di._
-  import libraries.Di.Reader
-  import play.api.libs.concurrent.Execution.Implicits.defaultContext
-  def tenDividedBy(a:Int):Try[Int] = Try(10/a)
-  def tryFor: Unit = {
-    val l = List(1,2,0,5)
-    val result:Reader[Int, Future[Int]] = for {
-      i <- pure(0)
-      r <- pure(tenDividedBy(i))
-      t <- Reader[Int, Future[Int]](x => Future(x+r.get))
-    } yield t
-    result(8).recover{case e => println("ok")}
-    l.flatMap(i => List(tenDividedBy(i)))
-  }
-*/
+
   /**
    * Execute job, send email with new ads
    * @param job
