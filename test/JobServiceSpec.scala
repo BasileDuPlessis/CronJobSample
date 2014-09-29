@@ -37,6 +37,19 @@ class JobServiceSpec extends Specification with EmbedConnection {
       ).get.id must beEqualTo(job.id)
 
     }
+
+    "Recover an exception with a wrong BSONID" in {
+      Await.result(
+        JobService.readFromId("BSON ID")(connection).recover{case e => e.getMessage}, Duration.Inf
+      ) must beEqualTo("wrong ObjectId: 'BSON ID'")
+    }
+
+    "Map a None value with a non existant BSONID" in {
+      val id = BSONObjectID.generate
+      Await.result(
+        JobService.readFromId(id.stringify)(connection).map{job => job}, Duration.Inf
+      ) must beNone
+    }
   }
 
   "JobService#upddateAds" should {

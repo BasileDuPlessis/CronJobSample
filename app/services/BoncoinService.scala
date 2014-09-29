@@ -69,7 +69,22 @@ object BoncoinService {
       case e => Logger.error("Error occurs while reading all jobs", e)
     }
   }
-
+/*
+  import libraries.Di._
+  import libraries.Di.Reader
+  import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def tenDividedBy(a:Int):Try[Int] = Try(10/a)
+  def tryFor: Unit = {
+    val l = List(1,2,0,5)
+    val result:Reader[Int, Future[Int]] = for {
+      i <- pure(0)
+      r <- pure(tenDividedBy(i))
+      t <- Reader[Int, Future[Int]](x => Future(x+r.get))
+    } yield t
+    result(8).recover{case e => println("ok")}
+    l.flatMap(i => List(tenDividedBy(i)))
+  }
+*/
   /**
    * Execute job, send email with new ads
    * @param job
@@ -80,13 +95,12 @@ object BoncoinService {
       id <- pure(job.id.get)
       html <- pure(Source.fromURL(job.url)("iso-8859-15").getLines().mkString)
       ads <- pure(parseAds(html).toList)
-      newAds <- pure(tryNewAds(ads, job.ads.get))
-      result <- newAds map {
-        l => {
-          sendMail(l)
-          JobService.updateAds(id.stringify, l).g
+      tryNewAds <- pure(tryNewAds(ads, job.ads.get))
+      result <- {
+          val newAds = tryNewAds.get
+          sendMail(newAds)
+          JobService.updateAds(id.stringify, newAds)
         }
-      }
     } yield result
   }
 

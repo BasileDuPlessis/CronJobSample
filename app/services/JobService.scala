@@ -23,21 +23,17 @@ object JobService {
    */
   def readFromId(id: String): Reader[DefaultDB, Future[Option[Job]]] =
     for {
-      tryId <- pure(BSONObjectID.parse(id))
-      result <- tryId map {oid => Job.read(oid)}
-    } yield result
+      futureId <- Future(BSONObjectID.parse(id).get)
+    } yield Job.read(futureId)
 
 
   def updateAds(id: String, ads: List[String]): Reader[DefaultDB, Future[LastError]] = {
     for {
-      tryId <- pure(BSONObjectID.parse(id))
-      result <- tryId map {
-        oid => Job.update(
-          oid,
-          BSONDocument("$addToSet" -> BSONDocument("ads" -> BSONDocument("$each" -> ads)))
-        )
-      }
-    } yield result
+      futureId <- Future(BSONObjectID.parse(id).get)
+    } yield Job.update(
+      futureId,
+      BSONDocument("$addToSet" -> BSONDocument("ads" -> BSONDocument("$each" -> ads)))
+    )
 
   }
 
