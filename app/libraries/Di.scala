@@ -24,8 +24,12 @@ object Di {
   /**
    * Convert a Future[A => Future[B]] to a Reader[A, Future[B]]
    */
-  implicit def FutureReaderToReaderFuture[A, B](future: Future[A => Future[B]]): Reader[A, Future[B]] =
+  implicit def FutureToReaderFuture[A, B](future: Future[A => Future[B]]): Reader[A, Future[B]] =
     (conn: A) => future.flatMap(f => f(conn))
 
-
+  /**
+   * Convert a Future[Reader[A, Future[B]]] to a Reader[A, Future[B]]
+   */
+  implicit def FutureReaderToReaderFuture[A, B](future: Future[Reader[A, Future[B]]]): Reader[A, Future[B]] =
+    (conn: A) => future.flatMap(f => f(conn))
 }

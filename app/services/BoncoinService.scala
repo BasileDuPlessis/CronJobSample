@@ -42,15 +42,15 @@ object BoncoinService {
 
   }
 
-  def tryNewAds(a: List[String], b: List[String]): Try[List[String]] = {
-    val diff = a.filterNot(b.toSet)
-    Try {
-      diff match {
-        case Nil => throw new Exception("No ads found")
-        case _ => diff
+  def getNewAds(a: List[String], b: List[String]): Future[List[String]] = {
+    Future {
+      a.filterNot(b.toSet) match {
+        case Nil => throw new Exception("No difference between list")
+        case diff => diff
       }
     }
   }
+
 
   def doJobs: Unit = {
     withMongoConnection {
@@ -77,16 +77,13 @@ object BoncoinService {
    */
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
-      id <- pure(job.id.get)
-      html <- pure(Source.fromURL(job.url)("iso-8859-15").getLines().mkString)
-      ads <- pure(parseAds(html).toList)
-      tryNewAds <- pure(tryNewAds(ads, job.ads.get))
-      result <- {
-          val newAds = tryNewAds.get
-          sendMail(newAds)
-          JobService.updateAds(id.stringify, newAds)
-        }
-    } yield result
+      id <- Future(job.id.get)
+      ads <- getNewAds(parseAds(Source.fromURL(job.url)("iso-8859-15").getLines().mkString).toList, job.ads.get)
+      if (ads.length > 0)
+    } yield {
+      sendMail(ads)
+      JobService.updateAds(id.stringify, ads)
+    }
   }
 
 }
