@@ -55,7 +55,7 @@ object BoncoinService {
             Logger.info("New ads saved with lastError: " + lastError)
           }
         } recover {
-          case e => Logger.info("No ads to save")
+          case e => Logger.info("No ads to save: " + e.getMessage)
         }
       }
     } recover {
