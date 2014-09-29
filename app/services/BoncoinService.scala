@@ -42,14 +42,7 @@ object BoncoinService {
 
   }
 
-  def getNewAds(a: List[String], b: List[String]): Future[List[String]] = {
-    Future {
-      a.filterNot(b.toSet) match {
-        case Nil => throw new Exception("No difference between list")
-        case diff => diff
-      }
-    }
-  }
+  def getNewAds(a: List[String], b: List[String]): List[String] = a.filterNot(b.toSet)
 
 
   def doJobs: Unit = {
@@ -78,7 +71,7 @@ object BoncoinService {
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
       id <- Future(job.id.get)
-      ads <- getNewAds(parseAds(Source.fromURL(job.url)("iso-8859-15").getLines().mkString).toList, job.ads.get)
+      ads <- Future(getNewAds(parseAds(Source.fromURL(job.url)("iso-8859-15").getLines().mkString).toList, job.ads.get))
       if (ads.length > 0)
     } yield {
       sendMail(ads)

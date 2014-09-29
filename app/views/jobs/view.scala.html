@@ -4,4 +4,10 @@
 
     <h1>@job.url</h1>
 
+    <ul>
+    @for(ad <- job.ads) {
+        <li>@ad</li>
+    }
+    </ul>
+
 }
