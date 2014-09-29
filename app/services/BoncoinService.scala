@@ -66,7 +66,7 @@ object BoncoinService {
         }
       }
     } recover {
-      case e => Logger.error("Error occurs while reading all jobs", e)
+      case e => Logger.error("Error occurs while reading all jobs: " + e.getMessage)
     }
   }
 
