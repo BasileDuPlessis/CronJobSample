@@ -27,13 +27,17 @@ object BoncoinService {
   //Get Html from url
   def getHtml(url: String): String = {
     Logger.info("Get html from url: " + url)
-    Source.fromURL(url)("iso-8859-15").getLines().mkString
+    val html = Source.fromURL(url)("iso-8859-15").getLines().mkString
+    Logger.info("HTML length: " + html.length)
+    html
   }
 
   //Get Ads from an url
   def parseAds(s: String): Set[String] = {
     Logger.info("Parse ads in string")
-    """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
+    val ads = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
+    Logger.info("Ads number: " + ads.size)
+    ads
   }
 
 
