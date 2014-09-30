@@ -27,9 +27,11 @@ object BoncoinService {
   //Get Html from url
   def getHtml(url: String): String = {
     Logger.info("Get html from url: " + url)
-    val html = Source.fromURL(url)("iso-8859-15").getLines().mkString
-    Logger.info("HTML length: " + html.length)
-    html
+    Source.fromURL(url)("iso-8859-15").getLines().foreach{
+      l => Logger.info(l)
+    }
+    Logger.info("HTML length: ")
+    ""
   }
 
   //Get Ads from an url
