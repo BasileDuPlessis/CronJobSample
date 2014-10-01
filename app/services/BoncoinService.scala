@@ -30,9 +30,10 @@ object BoncoinService {
   def getHtml(url: String): String = {
     Logger.info("Get html from url: " + url)
 
-    val conn = new URL(url).openConnection()
+    val con = new URL(url).openConnection()
+    con.setConnectTimeout(600000)
 
-    Logger.info("Time out: " + conn.getConnectTimeout)
+    Logger.info("Time out: " + con.getContentLength)
 
     ""
   }
