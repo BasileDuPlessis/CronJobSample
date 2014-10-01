@@ -32,7 +32,7 @@ object BoncoinService {
 
     val conn = new URL(url).openConnection()
 
-    Logger.info("HTML length: " + conn.getContentLength)
+    Logger.info("Time out: " + conn.getConnectTimeout)
 
     ""
   }
