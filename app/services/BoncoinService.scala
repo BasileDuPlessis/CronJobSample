@@ -38,7 +38,8 @@ object BoncoinService {
     con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)")
     con.connect()
 
-    Logger.info("Time out: " + con.getContent.asInstanceOf[String])
+    Logger.info("Code response: " + con.getResponseCode)
+    Logger.info("Response message: " + con.getResponseMessage)
 
     ""
   }
