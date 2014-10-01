@@ -11,7 +11,7 @@ resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositor
 libraryDependencies ++= Seq(
   cache,
   ws,
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5-SNAPSHOT",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
   "com.github.athieriot" %% "specs2-embedmongo" % "0.7.0",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0"
 )
