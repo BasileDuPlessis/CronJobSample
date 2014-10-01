@@ -1,8 +1,5 @@
 package services
 
-import java.net.URL
-import java.net.HttpURLConnection
-
 import models.Job
 import org.apache.commons.mail.EmailException
 import play.api.Logger
@@ -27,30 +24,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
  */
 object BoncoinService {
 
-  //Get Html from url
-  def getHtml(url: String): String = {
-    Logger.info("Get html from url: " + url)
-
-    val con = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
-    con.setConnectTimeout(15 * 1000)
-    con.setInstanceFollowRedirects(false)
-    con.setRequestMethod("GET")
-    con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)")
-    con.connect()
-
-    Logger.info("Code response: " + con.getResponseCode)
-    Logger.info("Response message: " + con.getResponseMessage)
-
-    ""
-  }
-
   //Get Ads from an url
-  def parseAds(s: String): Set[String] = {
-    Logger.info("Parse ads in string")
-    val ads = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
-    Logger.info("Ads number: " + ads.size)
-    ads
-  }
+  def parseAds(s: String): Set[String] = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
 
 
   //Send mail
@@ -96,7 +71,7 @@ object BoncoinService {
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
       id <- Future(job.id.get)
-      ads <- Future(getNewAds(parseAds(getHtml(job.url)).toList, job.ads.get))
+      ads <- Future(getNewAds(parseAds(Source.fromURL(job.url)("iso-8859-15").getLines().mkString).toList, job.ads.get))
       if (ads.length > 0)
     } yield {
       sendMail(ads)
