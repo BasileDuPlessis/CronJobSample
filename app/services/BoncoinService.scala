@@ -1,5 +1,7 @@
 package services
 
+import java.net.URL
+
 import models.Job
 import org.apache.commons.mail.EmailException
 import play.api.Logger
@@ -27,9 +29,12 @@ object BoncoinService {
   //Get Html from url
   def getHtml(url: String): String = {
     Logger.info("Get html from url: " + url)
-    val html = Source.fromURL(url)("iso-8859-15").getLines().mkString
-    Logger.info("HTML length: " + html.length)
-    html
+
+    val conn = new URL(url).openConnection()
+
+    Logger.info("HTML length: " + conn.getContentLength)
+
+    ""
   }
 
   //Get Ads from an url
