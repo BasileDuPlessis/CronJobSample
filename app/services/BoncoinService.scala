@@ -1,6 +1,7 @@
 package services
 
 import java.net.URL
+import java.net.HttpURLConnection
 
 import models.Job
 import org.apache.commons.mail.EmailException
@@ -30,10 +31,14 @@ object BoncoinService {
   def getHtml(url: String): String = {
     Logger.info("Get html from url: " + url)
 
-    val con = new URL(url).openConnection()
-    con.setConnectTimeout(600000)
+    val con = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
+    con.setConnectTimeout(15 * 1000)
+    con.setInstanceFollowRedirects(false)
+    con.setRequestMethod("GET")
+    con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)")
+    con.connect()
 
-    Logger.info("Time out: " + con.getContentLength)
+    Logger.info("Time out: " + con.getContent.asInstanceOf[String])
 
     ""
   }
