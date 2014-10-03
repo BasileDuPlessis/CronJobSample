@@ -13,6 +13,10 @@ object MongoConnection  {
 
   def connection: DefaultDB = ReactiveMongoPlugin.db
 
+  def testConfConnection = Map(
+    "mongodb.uri" -> "mongodb://localhost:12345/cronjobsample"
+  )
+
   def testConnection: DefaultDB = {
     val driver = new MongoDriver
     val connection = driver.connection("localhost:12345" :: Nil)

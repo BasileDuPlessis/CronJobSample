@@ -1,7 +1,10 @@
-@(message: String)
+@(jobs: List[Job])
 
-@main("Welcome to Play") {
+@main("Cron Job") {
 
-    @play20.welcome(message)
-
+    <ul>
+    @for(job <- jobs; id <- job.id) {
+        <li><a href="@routes.Jobs.view(id.stringify)">@job.url</a></li>
+    }
+    </ul>
 }
