@@ -7,8 +7,7 @@ import play.api.test.Helpers._
 
 import com.github.athieriot._
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import utils.MongoConnection.testConfConnection
 
 /**
  * Functional spec for Job controller
@@ -16,9 +15,7 @@ import scala.concurrent.duration.Duration
 class JobFunctionalSpec extends Specification with EmbedConnection {
   sequential
 
-  val conf = Map(
-    "mongodb.uri" -> "mongodb://localhost:12345/cronjobsample"
-  )
+  val conf = Map() ++ testConfConnection
 
   val fakeApp = FakeApplication(additionalConfiguration = conf)
 
