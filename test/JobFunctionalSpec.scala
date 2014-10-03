@@ -17,7 +17,7 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
   sequential
 
   val conf = Map(
-    "mongodb.servers" -> List("localhost:12345")
+    "mongodb.uri" -> "mongodb://localhost:12345/cronjobsample"
   )
 
   val fakeApp = FakeApplication(additionalConfiguration = conf)
@@ -28,7 +28,7 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
     "create a new Job on POST /job/create and redirect to /job/:id" in {
       val jobCreate = route(FakeRequest(POST, "/job/create").withFormUrlEncodedBody(
-        ("url", "http://www.leboncoin.fr")
+        ("url", "http://www.google.fr")
       )).get
 
       status(jobCreate) must equalTo(SEE_OTHER)
@@ -48,7 +48,7 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
     "show job details on GET /job/:id" in {
       val jobCreate = route(FakeRequest(POST, "/job/create").withFormUrlEncodedBody(
-        ("url", "http://www.leboncoin.fr")
+        ("url", "http://www.google.fr")
       )).get
 
       val id = "/job/(.+)$".r.findFirstMatchIn(redirectLocation(jobCreate).get).get.group(1)
@@ -57,7 +57,7 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
       status(jobDetails) must equalTo(OK)
 
-      contentAsString(jobDetails) must contain("http://www.leboncoin.fr")
+      contentAsString(jobDetails) must contain("http://www.google.fr")
 
     }
 

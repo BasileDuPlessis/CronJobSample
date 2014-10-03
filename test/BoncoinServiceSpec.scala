@@ -1,5 +1,5 @@
 import org.specs2.mutable.Specification
-import services.BoncoinService
+import services.AdsService
 
 /**
  * Specs for BoncoinService
@@ -15,7 +15,7 @@ class BoncoinServiceSpec extends Specification {
           <a href="http://www.leboncoin.fr/ventes_immobilieres/698697514.htm?ca=12_s" title="Tr&egrave;s Rare, Maison neuve F3 en beton cellulaire">
         """
 
-      BoncoinService.parseAds(s) must beEqualTo(
+      AdsService.parseAds(s) must beEqualTo(
         Set(
           "http://www.leboncoin.fr/ventes_immobilieres/698697514.htm",
           "http://www.leboncoin.fr/ventes_immobilieres/616284831.htm"

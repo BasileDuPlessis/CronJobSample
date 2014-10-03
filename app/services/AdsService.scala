@@ -22,7 +22,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 /**
  * Parse page and get new items
  */
-object BoncoinService {
+object AdsService {
 
   //Get Ads from an url
   def parseAds(s: String): Set[String] = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
@@ -31,11 +31,11 @@ object BoncoinService {
   //Send mail
   def sendMail(l: List[String]): Unit = {
     val mail = use[MailerPlugin].email
-    mail.setSubject("Alerte Job")
-    mail.setRecipient("Basile du Plessis <basile.duplessis@gmail.com>")
+    mail.setSubject("Alerte Annonce")
+    mail.setRecipient("Basile du Plessis <basile.duplessis@gmail.com>, Emmanuelle Ackermann <emmanuelle.ackermann@gmail.com>")
     mail.setFrom("Basile du Plessis <basile.duplessis@gmail.com>")
 
-    val text = l.mkString(", ")
+    val text = l.mkString("\r\n")
 
     mail.send( text, s"<html>$text</html>")
     Logger.info("Mail sent")
@@ -71,7 +71,8 @@ object BoncoinService {
   def doJob(job: Job): Reader[DefaultDB, Future[LastError]] = {
     for {
       id <- Future(job.id.get)
-      ads <- Future(getNewAds(parseAds(Source.fromURL(job.url)("iso-8859-15").getLines().mkString).toList, job.ads.get))
+      html <- Future(Source.fromURL(job.url)("iso-8859-15").getLines().mkString)
+      ads <- Future(getNewAds(parseAds(html).toList, job.ads.get))
       if (ads.length > 0)
     } yield {
       sendMail(ads)
