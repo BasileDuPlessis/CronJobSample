@@ -32,7 +32,7 @@ object AdsService {
   def sendMail(l: List[String]): Unit = {
     val mail = use[MailerPlugin].email
     mail.setSubject("Alerte Annonce")
-    mail.setRecipient("Basile du Plessis <basile.duplessis@gmail.com>, Emmanuelle Ackermann <emmanuelle.ackermann@gmail.com>")
+    mail.setRecipient("Basile du Plessis <basile.duplessis@gmail.com>", "Emmanuelle Ackermann <emmanuelle.ackermann@gmail.com>")
     mail.setFrom("Basile du Plessis <basile.duplessis@gmail.com>")
 
     val text = l.mkString("\r\n")
