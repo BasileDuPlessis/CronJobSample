@@ -8,6 +8,8 @@ scalaVersion := "2.11.1"
 
 resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
+libraryDependencies += "org.subethamail" % "subethasmtp" % "3.1.7"
+
 libraryDependencies ++= Seq(
   cache,
   ws,

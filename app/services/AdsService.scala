@@ -27,21 +27,6 @@ object AdsService {
   //Get Ads from an url
   def parseAds(s: String): Set[String] = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
 
-
-  //Send mail
-  def sendMail(l: List[String]): Unit = {
-    val mail = use[MailerPlugin].email
-    mail.setSubject("Alerte Annonce")
-    mail.setRecipient("Basile du Plessis <basile.duplessis@gmail.com>", "Emmanuelle Ackermann <emmanuelle.ackermann@gmail.com>")
-    mail.setFrom("Basile du Plessis <basile.duplessis@gmail.com>")
-
-    val text = l.mkString("\r\n")
-
-    mail.send( text, s"<html>$text</html>")
-    Logger.info("Mail sent")
-
-  }
-
   def getNewAds(a: List[String], b: List[String]): List[String] = a.filterNot(b.toSet)
 
 
@@ -75,7 +60,7 @@ object AdsService {
       ads <- Future(getNewAds(parseAds(html).toList, job.ads.get))
       if (ads.length > 0)
     } yield {
-      sendMail(ads)
+      MailService.sendMail(ads.mkString(","))
       JobService.updateAds(id.stringify, ads)
     }
   }
