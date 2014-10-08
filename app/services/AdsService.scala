@@ -25,7 +25,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 object AdsService {
 
   //Get Ads from an url
-  def parseAds(s: String): Set[String] = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
+  def parseAds(s: String): Set[String] = """(/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(s).toSet
 
   def getNewAds(a: List[String], b: List[String]): List[String] = a.filterNot(b.toSet)
 

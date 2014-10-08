@@ -17,3 +17,5 @@ libraryDependencies ++= Seq(
   "com.github.athieriot" %% "specs2-embedmongo" % "0.7.0",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0"
 )
+
+instrumentSettings

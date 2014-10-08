@@ -20,14 +20,17 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 trait EmbedSMTPServer extends FragmentsBuilder {
   self: SpecificationLike =>
 
-  val promiseMessage = Promise[String]
-  val receivedMessage = promiseMessage.future
+  var promiseMessage = Promise[String]
+  var lastReceivedMessage = promiseMessage.future
 
   lazy val messageListener = new SimpleMessageListener {
     def accept(from: String, recipient: String): Boolean = true
     def deliver(from: String, recipient: String, data: InputStream): Unit = {
-      if (!promiseMessage.isCompleted)
-        promiseMessage.success(Source.fromInputStream(data).mkString)
+      if (promiseMessage.isCompleted) {
+        promiseMessage = Promise[String]
+        lastReceivedMessage = promiseMessage.future
+      }
+      promiseMessage.success(Source.fromInputStream(data).mkString)
     }
   }
 
