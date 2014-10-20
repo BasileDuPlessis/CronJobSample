@@ -1,16 +1,18 @@
 package controllers
 
+import com.typesafe.plugin._
 import models.Job
 import play.api._
 import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
-import services.JobService
+import services.{MailService, JobService}
 
 import scala.concurrent.Future
 
 import utils.MongoConnection._
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 
 import play.api.Logger
 
@@ -51,6 +53,36 @@ object Jobs extends Controller {
         }
       }
     )
+  }
+
+  def executeAllJobs = {
+
+    import scala.io.Source
+    import play.api.Play.current
+
+    val mailerAPI = use[MailerPlugin].email
+
+    val executeJob = (job: Job) => for {
+      source <- Future(Source.fromURL(job.url)("ISO-8859-15").getLines().mkString)
+      matches <- Future("""(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(source).toList.toSet)
+      lastError <- withMongoConnection {JobService.updateAds(job.id.get.stringify, matches)}
+    } yield MailService.sendMail(
+        matches.mkString(","),
+        "Alerte Boncoin",
+        List("basile.duplessis@gmail.com", "emmanuelle.ackermann@gmail.com"),
+        "basile.duplessis@gmail.com"
+      )(mailerAPI)
+
+
+    withMongoConnection(Job.readAll) map {
+      jobs => jobs foreach {
+        job => executeJob(job) recover {
+          case e => Logger.error("Error occurs while executing job: " + e.getMessage)
+        }
+      }
+    } recover {
+      case e => Logger.error("Error occurs while reading jobs: " + e.getMessage)
+    }
   }
 
 }

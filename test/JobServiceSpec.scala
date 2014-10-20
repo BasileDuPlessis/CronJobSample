@@ -60,7 +60,7 @@ class JobServiceSpec extends Specification with EmbedConnection {
       Await.result(Job.insert(job)(connection), Duration.Inf)
 
       Await.result(
-        JobService.updateAds(job.id.get.stringify, List("A", "B", "A"))(connection), Duration.Inf
+        JobService.updateAds(job.id.get.stringify, Set("A", "B", "A"))(connection), Duration.Inf
       )
 
       Await.result(

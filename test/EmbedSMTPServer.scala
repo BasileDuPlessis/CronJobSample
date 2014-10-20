@@ -23,7 +23,7 @@ trait EmbedSMTPServer extends FragmentsBuilder {
   var promiseMessage = Promise[String]
   var lastReceivedMessage = promiseMessage.future
 
-  lazy val messageListener = new SimpleMessageListener {
+  val messageListener = new SimpleMessageListener {
     def accept(from: String, recipient: String): Boolean = true
     def deliver(from: String, recipient: String, data: InputStream): Unit = {
       if (promiseMessage.isCompleted) {
@@ -34,7 +34,7 @@ trait EmbedSMTPServer extends FragmentsBuilder {
     }
   }
 
-  lazy val smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(messageListener))
+  val smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(messageListener))
 
   private def startSMTP() = Example("Start SMTP Server", {smtpServer.start(); success})
   private def stopSMTP() = Example("Stop SMTP Server", {smtpServer.stop(); success})

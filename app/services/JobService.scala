@@ -27,14 +27,13 @@ object JobService {
     } yield Job.read(futureId)
 
 
-  def updateAds(id: String, ads: List[String]): Reader[DefaultDB, Future[LastError]] = {
+  def updateAds(id: String, ads: Set[String]): Reader[DefaultDB, Future[LastError]] = {
     for {
       futureId <- Future(BSONObjectID.parse(id).get)
     } yield Job.update(
       futureId,
       BSONDocument("$addToSet" -> BSONDocument("ads" -> BSONDocument("$each" -> ads)))
     )
-
   }
 
 

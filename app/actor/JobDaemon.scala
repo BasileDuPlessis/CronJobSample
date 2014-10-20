@@ -2,9 +2,8 @@ package actor
 
 
 import akka.actor.Actor
+import controllers.Jobs
 import play.api.Logger
-import services.AdsService
-import scala.io.Source
 
 
 /**
@@ -15,7 +14,7 @@ class JobDaemon extends Actor {
   def receive = {
     case "jobActor" => {
       Logger.info("Looking for jobs to execute")
-      AdsService.doJobs
+      Jobs.executeAllJobs
     }
   }
 
