@@ -1,5 +1,6 @@
 package services
 
+import com.typesafe.plugin.MailerAPI
 import libraries.Di._
 import libraries.Di.Reader
 
@@ -10,6 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import reactivemongo.bson._
 import reactivemongo.core.commands.LastError
 import scala.concurrent.Future
+import scala.io.Source
 
 
 /**
@@ -35,6 +37,8 @@ object JobService {
       BSONDocument("$addToSet" -> BSONDocument("ads" -> BSONDocument("$each" -> ads)))
     )
   }
+
+
 
 
 }

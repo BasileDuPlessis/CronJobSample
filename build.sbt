@@ -8,6 +8,8 @@ scalaVersion := "2.11.1"
 
 resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
+resolvers += "Maven Central Server" at "http://repo1.maven.org/maven2/"
+
 libraryDependencies += "org.subethamail" % "subethasmtp" % "3.1.7"
 
 libraryDependencies ++= Seq(
@@ -15,7 +17,8 @@ libraryDependencies ++= Seq(
   ws,
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
   "com.github.athieriot" %% "specs2-embedmongo" % "0.7.0",
-  "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0"
+  "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
+  "com.github.tomakehurst" % "wiremock" % "1.50"
 )
 
 instrumentSettings

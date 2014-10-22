@@ -1,4 +1,3 @@
-
 import com.typesafe.plugin._
 import play.api.Play.current
 import play.api.test._
@@ -9,7 +8,6 @@ import org.specs2.mutable.Specification
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-
 
 
 /**

@@ -70,5 +70,4 @@ class JobServiceSpec extends Specification with EmbedConnection {
     }
   }
 
-
 }
