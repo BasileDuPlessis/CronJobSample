@@ -1,17 +1,10 @@
-import java.io.InputStream
-
 import com.github.athieriot.EmbedConnection
 import controllers.Jobs
 import models.Job
 import org.junit.runner.RunWith
-import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
-import org.subethamail.smtp.helper.{SimpleMessageListenerAdapter, SimpleMessageListener}
-import org.subethamail.smtp.server.SMTPServer
-import play.api.test.FakeApplication
-import org.specs2.mutable.{ After, Specification }
+import org.specs2.mutable.Specification
 import play.api.test.Helpers._
-import reactivemongo.bson.BSONObjectID
 
 import utils.MongoConnection._
 
@@ -20,9 +13,8 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 
-import scala.concurrent.{Promise, Await}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import scala.io.Source
 
 @RunWith(classOf[JUnitRunner])
 /**
@@ -39,7 +31,10 @@ class JobExecutionServiceSpec extends Specification with EmbedConnection {
   WireMock.configureFor(Host, Port)
 
   "JobExecutionService#executeAll" should {
-    "update Ads and send Email" in new context {
+    "update Ads and send Email" in new EmbedSMTPContext {
+
+      override val additionalConfiguration = testConfConnection
+
       running(fakeApp) {
 
         val content = """
@@ -71,28 +66,5 @@ class JobExecutionServiceSpec extends Specification with EmbedConnection {
     }
   }
 
-  class context extends After {
-
-    val promiseMessage = Promise[String]
-    val lastReceivedMessage = promiseMessage.future
-
-    val messageListener = new SimpleMessageListener {
-      def accept(from: String, recipient: String): Boolean = true
-      def deliver(from: String, recipient: String, data: InputStream): Unit = {
-        if (!promiseMessage.isCompleted) promiseMessage.success(Source.fromInputStream(data).mkString)
-      }
-    }
-
-    val smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(messageListener))
-    smtpServer.start()
-
-    val conf =  Map("smtp.host" -> smtpServer.getHostName) ++ testConfConnection
-    val fakeApp = FakeApplication(additionalConfiguration = conf)
-
-    def after = {
-      step(smtpServer.stop())
-    }
-
-  }
 
 }

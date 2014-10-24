@@ -13,24 +13,22 @@ import scala.concurrent.duration.Duration
 /**
  * Specs for MailService
  */
-class MailServiceSpec extends Specification with EmbedSMTPServer {
-  sequential
-
-  val fakeApp = FakeApplication(
-    additionalConfiguration = Map("smtp.host" -> smtpServer.getHostName),
-    withoutPlugins = Seq("play.modules.reactivemongo.ReactiveMongoPlugin")
-  )
-
+class MailServiceSpec extends Specification {
 
   "MailService#sendMail" should {
-    "send email" in running(fakeApp) {
+    "send email" in new EmbedSMTPContext {
 
-      val message = "Hello World, this is the MailService !"
+      override val withoutPlugins = Seq("play.modules.reactivemongo.ReactiveMongoPlugin")
 
-      MailService.sendMail(message, "Subject", List("test@test.com"), "test@test.com")(use[MailerPlugin].email)
+      running(fakeApp) {
 
-      Await.result(lastReceivedMessage, Duration.Inf) must contain(message)
+        val message = "Hello World, this is the MailService !"
 
+        MailService.sendMail(message, "Subject", List("test@test.com"), "test@test.com")(use[MailerPlugin].email)
+
+        Await.result(lastReceivedMessage, Duration.Inf) must contain(message)
+
+      }
     }
   }
 
