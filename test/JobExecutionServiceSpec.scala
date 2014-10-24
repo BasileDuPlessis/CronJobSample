@@ -9,7 +9,7 @@ import org.specs2.runner.JUnitRunner
 import org.subethamail.smtp.helper.{SimpleMessageListenerAdapter, SimpleMessageListener}
 import org.subethamail.smtp.server.SMTPServer
 import play.api.test.FakeApplication
-import org.specs2.mutable.{ BeforeAfter, Specification }
+import org.specs2.mutable.{ After, Specification }
 import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
 
@@ -31,19 +31,6 @@ import scala.io.Source
 class JobExecutionServiceSpec extends Specification with EmbedConnection {
   sequential
 
-  val promiseMessage = Promise[String]
-  val lastReceivedMessage = promiseMessage.future
-
-  val messageListener = new SimpleMessageListener {
-    def accept(from: String, recipient: String): Boolean = true
-    def deliver(from: String, recipient: String, data: InputStream): Unit = {
-      if (!promiseMessage.isCompleted) promiseMessage.success(Source.fromInputStream(data).mkString)
-    }
-  }
-
-  val smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(messageListener))
-  smtpServer.start()
-
   val Port = 8080
   val Host = "localhost"
 
@@ -51,12 +38,8 @@ class JobExecutionServiceSpec extends Specification with EmbedConnection {
   wireMockServer.start()
   WireMock.configureFor(Host, Port)
 
-  val conf =  Map("smtp.host" -> smtpServer.getHostName) ++ testConfConnection
-
-  val fakeApp = FakeApplication(additionalConfiguration = conf)
-
   "JobExecutionService#executeAll" should {
-    "update Ads and send Email" in context {
+    "update Ads and send Email" in new context {
       running(fakeApp) {
 
         val content = """
@@ -88,12 +71,26 @@ class JobExecutionServiceSpec extends Specification with EmbedConnection {
     }
   }
 
-  object context extends BeforeAfter {
+  class context extends After {
 
-    def before = {
+    val promiseMessage = Promise[String]
+    val lastReceivedMessage = promiseMessage.future
+
+    val messageListener = new SimpleMessageListener {
+      def accept(from: String, recipient: String): Boolean = true
+      def deliver(from: String, recipient: String, data: InputStream): Unit = {
+        if (!promiseMessage.isCompleted) promiseMessage.success(Source.fromInputStream(data).mkString)
+      }
     }
 
+    val smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(messageListener))
+    smtpServer.start()
+
+    val conf =  Map("smtp.host" -> smtpServer.getHostName) ++ testConfConnection
+    val fakeApp = FakeApplication(additionalConfiguration = conf)
+
     def after = {
+      step(smtpServer.stop())
     }
 
   }
