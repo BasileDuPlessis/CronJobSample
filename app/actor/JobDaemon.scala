@@ -14,7 +14,7 @@ class JobDaemon extends Actor {
   def receive = {
     case "jobActor" => {
       Logger.info("Looking for jobs to execute")
-      Jobs.executeAllJobs
+      //Jobs.executeAllJobs
     }
   }
 
