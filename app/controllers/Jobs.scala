@@ -1,13 +1,13 @@
 package controllers
 
 import com.typesafe.plugin._
-import libraries.Di.Reader
+import libraries.Di._
 import models.Job
 import play.api._
 import play.api.mvc._
 import reactivemongo.api.DefaultDB
 import reactivemongo.bson.BSONObjectID
-import services.{JobExecutionService, MailService, JobService}
+import services.{MailService, JobService}
 
 import scala.concurrent.Future
 
@@ -17,6 +17,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
 import play.api.Logger
+
+import scala.io.Source
 
 /**
  * Controller for Job tasks
@@ -63,8 +65,29 @@ object Jobs extends Controller {
 
     val mailerAPI = use[MailerPlugin].email
 
-    JobExecutionService.executeAll(connection) map {
-      jobs => jobs map (_(connection)(mailerAPI))
+    withMongoConnection(Job.readAll) map {
+      jobs => jobs foreach {
+        job => {
+          val ads = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(Source.fromURL(job.url)("ISO-8859-15").getLines().mkString).toSet
+          val diff = ads.filterNot(job.ads.get.toSet)
+
+          if (diff.size > 0) {
+            withMongoConnection(JobService.updateAds(job.id.get.stringify, diff)) map {
+              lastError => Logger.info("Ads saved with: " + lastError)
+            } recover {
+              case e => Logger.error("Unable to save ads: " + e.getMessage)
+            }
+            MailService.sendMail(
+              diff.mkString(", "),
+              "Alerte Boncoin",
+              List("basile.duplessis@gmail.com", "emmanuelle.ackermann@gmail.com"),
+              "basile.duplessis@gmail.com"
+            )(mailerAPI)
+          }
+        }
+      }
+    } recover {
+      case e => Logger.error("Unable to read all jobs: " + e.getMessage)
     }
 
   }
