@@ -37,6 +37,7 @@ class MigrationSpec extends Specification with EmbedConnection {
       ).get.id must beEqualTo(job.id)
 
     }
+  }
 
 
 }
