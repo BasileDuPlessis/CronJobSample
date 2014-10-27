@@ -31,7 +31,7 @@ class JobModelSpec extends Specification with Mockito {
 
       val mockDefaultDB = mock[DefaultDB]
       val mockCollection = mock[BSONCollection]
-      val job = Job(None, "http://www.google.fr", None)
+      val job = Job(None, "http://www.google.fr", None, "")
 
       when(
         mockDefaultDB[BSONCollection](anyString, any)(any)
@@ -54,7 +54,7 @@ class JobModelSpec extends Specification with Mockito {
       val mockDefaultDB = mock[DefaultDB]
       val mockCollection = mock[BSONCollection]
       val id = BSONObjectID.generate
-      val job = Job(Some(id), "http://www.google.fr", None)
+      val job = Job(Some(id), "http://www.google.fr", None, "")
 
       when(
         mockDefaultDB[BSONCollection](anyString, any)(any)

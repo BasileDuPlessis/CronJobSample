@@ -37,13 +37,10 @@ class JobDeamonSpec extends Specification with EmbedConnection {
 
       running(fakeApp) {
 
-        val content = """
-          http://www.leboncoin.fr/ventes_immobilieres/0123456789.htm
-          http://www.leboncoin.fr/ventes_immobilieres/9876543210.htm
-        """
+        val contentMatchA = "http://www.azertyui.op/directory/0123456789.htm"
+        val contentMatchB = "http://www.azertyui.op/directory/9876543210.htm"
 
-        val contentMatchA = "http://www.leboncoin.fr/ventes_immobilieres/0123456789.htm"
-        val contentMatchB = "http://www.leboncoin.fr/ventes_immobilieres/9876543210.htm"
+        val content = contentMatchA + " <-- TEXT CONTENT --> " + contentMatchB
 
         stubFor(
           get(urlEqualTo("/"))
@@ -53,12 +50,17 @@ class JobDeamonSpec extends Specification with EmbedConnection {
             )
         )
 
-        val job = Job(Some(BSONObjectID.generate), "http://localhost:8080/", None)
+        val job = Job(
+          Some(BSONObjectID.generate),
+          "http://localhost:8080/",
+          None,
+          """(http://www.azertyui.op/directory/[0-9]+\.htm)"""
+        )
 
         Await.result(Job.insert(job)(connection), Duration(10, "seconds"))
         Await.result(
           JobService.updateAds(
-            job.id.get.stringify, Set("""http://www.leboncoin.fr/ventes_immobilieres/9876543210.htm""")
+            job.id.get.stringify, Set("""http://www.azertyui.op/directory/9876543210.htm""")
           )(connection), Duration.Inf
         )
 

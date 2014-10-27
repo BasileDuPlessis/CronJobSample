@@ -4,6 +4,7 @@
 
     @helper.form(action = routes.Jobs.create) {
         @helper.inputText(jobForm("url"))
+        @helper.inputText(jobForm("pattern"))
         <input type="submit" />
     }
 

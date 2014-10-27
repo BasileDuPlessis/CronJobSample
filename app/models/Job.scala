@@ -23,7 +23,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 case class Job(
   id: Option[BSONObjectID],
   url: String,
-  ads: Option[List[String]]
+  ads: Option[List[String]],
+  pattern: String
 )
 
 
@@ -36,7 +37,8 @@ object Job {
       Job(
         doc.getAs[BSONObjectID]("_id"),
         doc.getAs[String]("url").get,
-        doc.getAs[List[String]]("ads")
+        doc.getAs[List[String]]("ads"),
+        doc.getAs[String]("pattern").get
       )
   }
 
@@ -46,7 +48,8 @@ object Job {
       BSONDocument(
         "_id" -> job.id.getOrElse(BSONObjectID.generate),
         "url" -> job.url,
-        "ads" -> job.ads.getOrElse(List[String]())
+        "ads" -> job.ads.getOrElse(List[String]()),
+        "pattern" -> job.pattern
       )
   }
 
@@ -56,6 +59,15 @@ object Job {
 
   def update(id: BSONObjectID, modifier: BSONDocument): DefaultDB => Future[LastError] = {
     db:DefaultDB =>  db[BSONCollection](collectionName).update(BSONDocument("_id" -> id), modifier)
+  }
+
+
+
+  def addDefaultPatternToUndefinedPatternFields(pattern: String): DefaultDB => Future[LastError] = {
+    db:DefaultDB =>  db[BSONCollection](collectionName).update(
+      BSONDocument("pattern" -> BSONDocument("$exists" -> false)),
+      BSONDocument("pattern" -> pattern)
+    )
   }
 
   /**
@@ -76,7 +88,8 @@ object Job {
     mapping(
       "id" -> optional(of[BSONObjectID]),
       "url" -> text,
-      "results" -> optional(list(text))
+      "results" -> optional(list(text)),
+      "pattern" -> text
     )(Job.apply)(Job.unapply)
   )
 

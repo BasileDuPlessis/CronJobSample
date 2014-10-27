@@ -6,7 +6,8 @@ import models.Job
 import play.api._
 import play.api.mvc._
 import reactivemongo.api.DefaultDB
-import reactivemongo.bson.BSONObjectID
+import reactivemongo.api.collections.default.BSONCollection
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import services.{MailService, JobService}
 
 import scala.concurrent.Future
@@ -77,6 +78,7 @@ object Jobs extends Controller {
             } recover {
               case e => Logger.error("Unable to save ads: " + e.getMessage)
             }
+
             MailService.sendMail(
               diff.mkString(", "),
               "Alerte Boncoin",
@@ -92,4 +94,13 @@ object Jobs extends Controller {
 
   }
 
+  def migrationAddPattern = Action.async {
+    withMongoConnection{
+      Job.addDefaultPatternToUndefinedPatternFields("""(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""")
+    } map {
+      lastError => Ok("done")
+    } recover {
+      case e => BadRequest(e.getMessage)
+    }
+  }
 }

@@ -28,7 +28,7 @@ class JobServiceSpec extends Specification with EmbedConnection {
   "JobService#readFromId" should {
     "read a job from a string ID" in {
 
-      val job = Job(Some(BSONObjectID.generate), "url", None)
+      val job = Job(Some(BSONObjectID.generate), "url", None, "")
 
       Await.result(Job.insert(job)(connection), Duration.Inf)
 
@@ -55,7 +55,7 @@ class JobServiceSpec extends Specification with EmbedConnection {
   "JobService#upddateAds" should {
     "Add non existant ads in ads field" in {
 
-      val job = Job(Some(BSONObjectID.generate), "url", None)
+      val job = Job(Some(BSONObjectID.generate), "url", None, "")
 
       Await.result(Job.insert(job)(connection), Duration.Inf)
 
