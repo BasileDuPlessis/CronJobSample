@@ -80,7 +80,7 @@ object Jobs extends Controller {
             }
 
             MailService.sendMail(
-              diff.mkString(", "),
+              views.html.mail.alert.render(diff).body,
               "Alerte email",
               List("basile.duplessis@gmail.com", "emmanuelle.ackermann@gmail.com"),
               "basile.duplessis@gmail.com"

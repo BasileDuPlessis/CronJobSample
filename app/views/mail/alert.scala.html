@@ -1,0 +1,12 @@
+@(ads: Set[String])
+
+<h3>Mail alert</h3>
+
+
+@for(ad <- ads) {
+    <ul>
+        @for(ad <- ads) {
+            <li><a href="@ad">@ad</a></li>
+        }
+    </ul>
+}
