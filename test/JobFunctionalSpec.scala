@@ -25,7 +25,8 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
     "create a new Job on POST /job/create and redirect to /job/:id" in {
       val jobCreate = route(FakeRequest(POST, "/job/create").withFormUrlEncodedBody(
-        ("url", "http://www.google.fr")
+        ("url", "testUrl"),
+        ("pattern", "testPattern")
       )).get
 
       status(jobCreate) must equalTo(SEE_OTHER)
@@ -45,7 +46,8 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
     "show job details on GET /job/:id" in {
       val jobCreate = route(FakeRequest(POST, "/job/create").withFormUrlEncodedBody(
-        ("url", "http://www.google.fr")
+        ("url", "testUrl"),
+        ("pattern", "testPattern")
       )).get
 
       val id = "/job/(.+)$".r.findFirstMatchIn(redirectLocation(jobCreate).get).get.group(1)
@@ -54,7 +56,7 @@ class JobFunctionalSpec extends Specification with EmbedConnection {
 
       status(jobDetails) must equalTo(OK)
 
-      contentAsString(jobDetails) must contain("http://www.google.fr")
+      contentAsString(jobDetails) must contain("testUrl")
 
     }
 

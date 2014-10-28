@@ -69,7 +69,7 @@ object Jobs extends Controller {
     withMongoConnection(Job.readAll) map {
       jobs => jobs foreach {
         job => {
-          val ads = """(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""".r.findAllIn(Source.fromURL(job.url)("ISO-8859-15").getLines().mkString).toSet
+          val ads = job.pattern.r.findAllIn(Source.fromURL(job.url)("ISO-8859-15").getLines().mkString).toSet
           val diff = ads.filterNot(job.ads.get.toSet)
 
           if (diff.size > 0) {
@@ -81,7 +81,7 @@ object Jobs extends Controller {
 
             MailService.sendMail(
               diff.mkString(", "),
-              "Alerte Boncoin",
+              "Alerte email",
               List("basile.duplessis@gmail.com", "emmanuelle.ackermann@gmail.com"),
               "basile.duplessis@gmail.com"
             )(mailerAPI)
@@ -94,9 +94,9 @@ object Jobs extends Controller {
 
   }
 
-  def migrationAddPattern = Action.async {
+  def migrationAddPattern(p: String) = Action.async {
     withMongoConnection{
-      Job.addDefaultPatternToUndefinedPatternFields("""(http://www.leboncoin.fr/ventes_immobilieres/[0-9]+\.htm)""")
+      Job.addDefaultPatternToUndefinedPatternFields(p)
     } map {
       lastError => Ok("done")
     } recover {

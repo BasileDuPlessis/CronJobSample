@@ -33,7 +33,7 @@ object JobService {
     for {
       futureId <- Future(BSONObjectID.parse(id).get)
     } yield Job.update(
-      futureId,
+      BSONDocument("_id" -> futureId),
       BSONDocument("$addToSet" -> BSONDocument("ads" -> BSONDocument("$each" -> ads)))
     )
   }

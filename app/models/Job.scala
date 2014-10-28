@@ -38,7 +38,7 @@ object Job {
         doc.getAs[BSONObjectID]("_id"),
         doc.getAs[String]("url").get,
         doc.getAs[List[String]]("ads"),
-        doc.getAs[String]("pattern").get
+        doc.getAs[String]("pattern").getOrElse("a^") //do not match anything
       )
   }
 
@@ -57,16 +57,17 @@ object Job {
     db:DefaultDB =>  db[BSONCollection](collectionName).insert[Job](job)
   }
 
-  def update(id: BSONObjectID, modifier: BSONDocument): DefaultDB => Future[LastError] = {
-    db:DefaultDB =>  db[BSONCollection](collectionName).update(BSONDocument("_id" -> id), modifier)
+  def update(selector: BSONDocument, modifier: BSONDocument): DefaultDB => Future[LastError] = {
+    db:DefaultDB =>  db[BSONCollection](collectionName).update(selector, modifier)
   }
 
 
 
   def addDefaultPatternToUndefinedPatternFields(pattern: String): DefaultDB => Future[LastError] = {
     db:DefaultDB =>  db[BSONCollection](collectionName).update(
-      BSONDocument("pattern" -> BSONDocument("$exists" -> false)),
-      BSONDocument("pattern" -> pattern)
+      selector = BSONDocument("pattern" -> BSONDocument("$exists" -> false)),
+      update = BSONDocument("$set" -> BSONDocument("pattern" -> pattern)),
+      multi = true
     )
   }
 

@@ -130,7 +130,7 @@ class JobModelSpec extends Specification with Mockito {
 
 
       Await.result(
-        Job.update(id, modifier)(mockDefaultDB), Duration.Inf
+        Job.update(selector, modifier)(mockDefaultDB), Duration.Inf
       )
 
       there was one(mockCollection).update(selector, modifier)
