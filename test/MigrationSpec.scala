@@ -42,7 +42,7 @@ class MigrationSpec extends Specification with EmbedConnection {
           Duration(20, "seconds")
         )
       }
-
+//test git
       val idNewJob = BSONObjectID.generate
       val job = Job(Some(idNewJob), "url", Some(List()), "newPattern")
       Await.result(Job.insert(job)(connection), Duration(20, "seconds"))
