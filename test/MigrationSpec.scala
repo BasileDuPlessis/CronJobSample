@@ -28,7 +28,7 @@ class MigrationSpec extends Specification with EmbedConnection {
   "Jobs#migrationAddPattern" should {
     "add a pattern field to a job without one" in {
 
-      val ids = for (i <- (1 to 2)) yield BSONObjectID.generate
+      val ids = for (i <- 1 to 2) yield BSONObjectID.generate
 
       ids.foreach {
         id => Await.result(
@@ -58,7 +58,7 @@ class MigrationSpec extends Specification with EmbedConnection {
           Job.read(id)(connection), Duration(20, "seconds")
         ).get.pattern
       } must beEqualTo(Seq("pattern", "pattern"))
-
+//test local
       Await.result(
         Job.read(idNewJob)(connection), Duration(20, "seconds")
       ).get must beEqualTo(job)
