@@ -88,9 +88,9 @@ object Job {
   val jobForm = Form(
     mapping(
       "id" -> optional(of[BSONObjectID]),
-      "url" -> text,
+      "url" -> nonEmptyText,
       "results" -> optional(list(text)),
-      "pattern" -> text
+      "pattern" -> nonEmptyText
     )(Job.apply)(Job.unapply)
   )
 

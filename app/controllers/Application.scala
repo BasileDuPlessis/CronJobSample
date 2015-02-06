@@ -1,6 +1,7 @@
 package controllers
 
 import play.api._
+import play.api.libs.iteratee.{Enumeratee, Iteratee}
 import play.api.mvc._
 import models.Job
 import utils.MongoConnection._
@@ -10,6 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 object Application extends Controller {
 
   def index = Action.async {
+
     withMongoConnection {
       Job.readAll
     } map {
@@ -17,6 +19,7 @@ object Application extends Controller {
     } recover {
       case e => InternalServerError
     }
+
   }
 
 }
