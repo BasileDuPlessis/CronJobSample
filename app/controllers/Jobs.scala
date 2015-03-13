@@ -9,6 +9,7 @@ import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import services.{MailService, JobService}
+import java.net.URL
 
 import scala.concurrent.Future
 
@@ -69,7 +70,10 @@ object Jobs extends Controller {
     withMongoConnection(Job.readAll) map {
       jobs => jobs foreach {
         job => {
-          val ads = job.pattern.r.findAllIn(Source.fromURL(job.url)("ISO-8859-15").getLines().mkString).toSet
+          val url = new URL(job.url)
+          val host = url.getHost
+          val ads = job.pattern.r.findAllIn(Source.fromURL(url)("ISO-8859-15").getLines().mkString).toSet
+          ads.filter(_.head == "/").map(host + _)
           val diff = ads.filterNot(job.ads.get.toSet)
 
           if (diff.size > 0) {
