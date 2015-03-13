@@ -73,8 +73,15 @@ object Jobs extends Controller {
           val url = new URL(job.url)
           val host = url.getHost
           val ads = job.pattern.r.findAllIn(Source.fromURL(url)("ISO-8859-15").getLines().mkString).toSet
-          ads.filter(_.head == "/").map(host + _)
-          val diff = ads.filterNot(job.ads.get.toSet)
+          
+          val absAds = ads map { ad => 
+            ad match {
+              case s:String if s._head == "/" => host + _
+              case _ => _
+            }
+          }
+          
+          val diff = absAds.filterNot(job.ads.get.toSet)
 
           if (diff.size > 0) {
             withMongoConnection(JobService.updateAds(job.id.get.stringify, diff)) map {
