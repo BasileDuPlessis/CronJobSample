@@ -77,7 +77,7 @@ object Jobs extends Controller {
           //Relative urls to absolute
           val absAds = ads map { ad => 
             ad match {
-              case s:String if s.head == "/" => host + s
+              case s:String if s.head == '/' => host + s
               case _ => ad
             }
           }
