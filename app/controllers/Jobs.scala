@@ -76,8 +76,8 @@ object Jobs extends Controller {
           
           val absAds = ads map { ad => 
             ad match {
-              case s:String if s.head == "/" => host + _
-              case _ => _
+              case s:String if s.head == "/" => host + s
+              case _ => ad
             }
           }
           
