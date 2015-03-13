@@ -74,6 +74,7 @@ object Jobs extends Controller {
           val host = url.getHost
           val ads = job.pattern.r.findAllIn(Source.fromURL(url)("ISO-8859-15").getLines().mkString).toSet
           
+          //Relative urls to absolute
           val absAds = ads map { ad => 
             ad match {
               case s:String if s.head == "/" => host + s
