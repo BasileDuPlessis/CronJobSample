@@ -15,7 +15,7 @@ libraryDependencies += "org.subethamail" % "subethasmtp" % "3.1.7"
 libraryDependencies ++= Seq(
   cache,
   ws,
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.7.play23",
   "com.github.athieriot" %% "specs2-embedmongo" % "0.7.0",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
   "com.github.tomakehurst" % "wiremock" % "1.50"
